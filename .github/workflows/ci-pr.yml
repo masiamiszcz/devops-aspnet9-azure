@@ -18,10 +18,11 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore DevOpsDemo.Api/DevOpsDemo.Api.csproj
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build DevOpsDemo.Api/DevOpsDemo.Api.csproj --no-restore --configuration Release
 
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test DevOpsDemo.Tests/DevOpsDemo.Tests.csproj --no-build --verbosity normal
+
