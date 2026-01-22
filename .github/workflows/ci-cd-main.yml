@@ -38,4 +38,4 @@ jobs:
 
       # Build Docker image tylko dla projektu API
       - name: Build Docker image
-        run: docker build -t devops-demo DevOpsDemo.Api/
+        run: docker build -t devops-demo .
