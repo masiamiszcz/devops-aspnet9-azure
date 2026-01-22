@@ -39,3 +39,11 @@ jobs:
       # Build Docker image tylko dla projektu API
       - name: Build Docker image
         run: docker build -t devops-demo .
+    
+      - name: Deploy to Render
+        if: success()
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          echo "Triggering deploy on Render..."
+          curl -s -f -X POST $RENDER_DEPLOY_HOOK -o /dev/null
