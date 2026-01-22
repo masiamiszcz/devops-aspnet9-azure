@@ -17,16 +17,25 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Restore dependencies
+      # Restore dependencies dla API i Tests
+      - name: Restore API
         run: dotnet restore DevOpsDemo.Api/DevOpsDemo.Api.csproj
 
-      - name: Build
+      - name: Restore Tests
+        run: dotnet restore DevOpsDemo.Tests/DevOpsDemo.Tests.csproj
+
+      # Build API
+      - name: Build API
         run: dotnet build DevOpsDemo.Api/DevOpsDemo.Api.csproj --no-restore --configuration Release
 
-      - name: Test
-        run: dotnet test DevOpsDemo.Tests/DevOpsDemo.Tests.csproj --no-build --v
+      # Build Tests
+      - name: Build Tests
+        run: dotnet build DevOpsDemo.Tests/DevOpsDemo.Tests.csproj --no-restore --configuration Release
 
+      # Run tests
+      - name: Run Tests
+        run: dotnet test DevOpsDemo.Tests/DevOpsDemo.Tests.csproj --no-build --verbosity normal
+
+      # Build Docker image tylko dla projektu API
       - name: Build Docker image
-        run: docker build -t devops-demo .
-
-      # Push i deploy można dodać później, np. do Azure Container Registry
+        run: docker build -t devops-demo DevOpsDemo.Api/
