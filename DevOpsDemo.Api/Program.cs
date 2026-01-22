@@ -43,3 +43,5 @@ app.MapGet("/products", async (HttpClient http) =>
 
 
 app.Run();
+// To make Program class accessible for integration tests
+public partial class Program { }
