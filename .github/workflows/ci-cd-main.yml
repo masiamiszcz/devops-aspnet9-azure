@@ -34,7 +34,7 @@ jobs:
 
       # Run tests
       - name: Run Tests
-        run: dotnet test DevOpsDemo.Tests/DevOpsDemo.Tests.csproj --no-build --verbosity normal
+        run: dotnet test DevOpsDemo.Tests/DevOpsDemo.Tests.csproj--verbosity normal
 
       # Build Docker image tylko dla projektu API
       - name: Build Docker image
