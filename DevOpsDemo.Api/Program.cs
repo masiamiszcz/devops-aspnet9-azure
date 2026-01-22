@@ -19,7 +19,7 @@ app.UseHttpsRedirection();
 // ROOT endpoint
 app.MapGet("/", () => Results.Ok(new
 {
-    name = "DevOps ASP.NET 9 Demo API",
+    name = "KORNELIA JEST SUPER",
     status = "Running",
     timestamp = DateTime.UtcNow
 }));
