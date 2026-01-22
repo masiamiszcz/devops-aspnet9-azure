@@ -19,9 +19,10 @@ Celem projektu jest zaprezentowanie pełnego procesu DevOps:
 - Azure Application Insights
 - Infrastructure as Code (Bicep)
 
-## 🚀 Uruchomienie lokalne (w przyszłości)
-```bash
-dotnet run
+## 📡 Endpointy
+- `GET /` – status aplikacji
+- `GET /products` – dane z zewnętrznego API (CoinGecko)
+
 
 
 
