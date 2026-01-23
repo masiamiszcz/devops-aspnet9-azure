@@ -58,7 +58,7 @@ app.MapGet("/products", async (HttpClient http, ILogger<Program> logger) =>
     logger.LogInformation("Products endpoint '/products' called");
 
     var url =
-        "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd";
+        "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin";
 
     var request = new HttpRequestMessage(HttpMethod.Get, url);
     request.Headers.Add("User-Agent", "DevOpsDemoApp/1.0");
