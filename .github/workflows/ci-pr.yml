@@ -10,18 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup .NET 9
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
 
-      - name: Restore dependencies
-        run: dotnet restore
+      - name: Restore API
+        run: dotnet restore DevOpsDemo.Api/DevOpsDemo.Api.csproj
 
-      - name: Build
-        run: dotnet build --no-restore --configuration Release
+      - name: Restore Tests
+        run: dotnet restore DevOpsDemo.Tests/DevOpsDemo.Tests.csproj
 
-      - name: Test
-        run: dotnet test --no-build --verbosity normal
+      - name: Build API
+        run: dotnet build DevOpsDemo.Api/DevOpsDemo.Api.csproj --no-restore --configuration Release
+
+      - name: Build Tests
+        run: dotnet build DevOpsDemo.Tests/DevOpsDemo.Tests.csproj --no-restore --configuration Release
+              
+      - name: Run Tests
+        run: dotnet test DevOpsDemo.Tests/DevOpsDemo.Tests.csproj --configuration Release --verbosity normal
+

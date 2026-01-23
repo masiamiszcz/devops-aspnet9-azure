@@ -1,0 +1,10 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0
+
+WORKDIR /src
+COPY . .
+
+# Restore only tests project for speed (optional)
+RUN dotnet restore DevOpsDemo.Tests/DevOpsDemo.Tests.csproj
+
+# Default command runs tests
+CMD ["dotnet", "test", "DevOpsDemo.Tests/DevOpsDemo.Tests.csproj", "--logger:trx"]

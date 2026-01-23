@@ -25,7 +25,7 @@ namespace DevOpsDemo.Tests
             var json = await response.Content.ReadFromJsonAsync<JsonElement>();
 
             Assert.True(json.TryGetProperty("name", out var name));
-            Assert.Equal("DevOps ASP.NET 9 Demo API", name.GetString());
+            Assert.Equal("KORNELIA JEST SUPER", name.GetString());
         }
 
         [Fact]
