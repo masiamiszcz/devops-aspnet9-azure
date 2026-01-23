@@ -47,7 +47,8 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t devops-demo:latest DevOpsDemo.Api/
+        run: docker build -t devops-demo:latest -f Dockerfile .
+
 
       # optional smoke test: run container and curl /health
       - name: Run container for smoke test
