@@ -8,18 +8,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      build-succeeded: ${{ steps.buildout.outcome }}
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup .NET 9
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
+
       - name: Restore API
         run: dotnet restore DevOpsDemo.Api/DevOpsDemo.Api.csproj
+
       - name: Build API
         run: dotnet build DevOpsDemo.Api/DevOpsDemo.Api.csproj --no-restore --configuration Release
+
       - name: Upload build artifact (optional)
         if: success()
         run: echo "build ok"
@@ -29,14 +31,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup .NET 9
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
+
       - name: Restore Tests
         run: dotnet restore DevOpsDemo.Tests/DevOpsDemo.Tests.csproj
+
       - name: Build Tests
         run: dotnet build DevOpsDemo.Tests/DevOpsDemo.Tests.csproj --no-restore --configuration Release
+
       - name: Run Tests
         run: dotnet test DevOpsDemo.Tests/DevOpsDemo.Tests.csproj --configuration Release --verbosity normal
 
@@ -46,15 +52,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Docker image
-        run: docker build -t devops-demo:latest -f Dockerfile .
+      - name: Login to GHCR
+        run: |
+          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
 
+      - name: Build & tag image
+        run: |
+          IMAGE=ghcr.io/${{ github.repository }}/devops-demo:${{ github.sha }}
+          echo "Image: $IMAGE"
+          docker build -t $IMAGE -f Dockerfile .
 
-      # optional smoke test: run container and curl /health
+      - name: Push image to GHCR
+        run: |
+          IMAGE=ghcr.io/${{ github.repository }}/devops-demo:${{ github.sha }}
+          docker push $IMAGE
+
+      # optional smoke test: run container and curl /health (the runner is already logged into GHCR)
       - name: Run container for smoke test
         run: |
-          docker run --rm -d --name smoke-devops-demo -p 8080:8080 devops-demo:latest
-          # wait for health to become healthy (simple loop)
+          IMAGE=ghcr.io/${{ github.repository }}/devops-demo:${{ github.sha }}
+          docker run --rm -d --name smoke-devops-demo -p 8080:8080 $IMAGE
           for i in {1..15}; do
             if curl -fsS http://localhost:8080/health >/dev/null 2>&1; then
               echo "healthy"
@@ -65,15 +82,3 @@ jobs:
           done
           curl -f http://localhost:8080/health
         timeout-minutes: 5
-
-  deploy:
-    needs: docker-build
-    runs-on: ubuntu-latest
-    if: success()  # only if all needs succeeded
-    steps:
-      - name: Trigger Render deploy
-        env:
-          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
-        run: |
-          echo "Triggering deploy on Render..."
-          curl -s -f -X POST $RENDER_DEPLOY_HOOK -o /dev/null

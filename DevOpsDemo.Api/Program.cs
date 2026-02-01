@@ -13,7 +13,7 @@ Log.Logger = new LoggerConfiguration()
     )
     .CreateLogger();
 
-builder.Host.UseSerilog();
+builder.Host.UseSerilog();  
 
 
 // Add services
