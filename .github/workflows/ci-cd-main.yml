@@ -101,10 +101,6 @@ jobs:
           az containerapp update \
             --name $APP_NAME \
             --resource-group $RESOURCE_GROUP \
-            --image $IMAGE \
-            --registry-server ghcr.io \
-            --registry-username masiamiszcz \
-            --registry-password $AZURE_TOKEN
-        env:
-          AZURE_TOKEN: ${{ secrets.AZURE_TOKEN }}
+            --image $IMAGE
+
 
