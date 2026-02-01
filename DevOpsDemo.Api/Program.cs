@@ -80,6 +80,19 @@ app.MapGet("/products", async (HttpClient http, ILogger<Program> logger) =>
     }
 });
 
+// HELLO endpoint
+app.MapGet("/hello", () =>
+{
+    Log.Information("Hello endpoint called");
+
+    return Results.Ok(new
+    {
+        message = "hello n",
+        timestamp = DateTime.UtcNow
+    });
+});
+
+
 app.MapGet("/health", () =>
 {
     Log.Information("Health check endpoint called");
