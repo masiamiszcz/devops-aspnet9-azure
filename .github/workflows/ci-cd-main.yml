@@ -67,7 +67,6 @@ jobs:
           IMAGE=ghcr.io/${{ github.repository }}/devops-demo:${{ github.sha }}
           docker push $IMAGE
 
-      # optional smoke test: run container and curl /health (the runner is already logged into GHCR)
       - name: Run container for smoke test
         run: |
           IMAGE=ghcr.io/${{ github.repository }}/devops-demo:${{ github.sha }}
@@ -82,3 +81,33 @@ jobs:
           done
           curl -f http://localhost:8080/health
         timeout-minutes: 5
+
+  deploy:
+    needs: docker-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Azure
+        run: |
+          echo "${{ secrets.AZURE_TOKEN }}" | az login --service-principal --username APP_ID --tenant TENANT_ID --password -
+        env:
+          AZURE_TOKEN: ${{ secrets.AZURE_TOKEN }}
+
+      - name: Update Azure Container App image
+        run: |
+          APP_NAME="devopsdemo-api"
+          RESOURCE_GROUP="rg-masiamiszcz-deploy"
+          IMAGE=ghcr.io/${{ github.repository }}/devops-demo:${{ github.sha }}
+
+          # Pobierz aktualną rewizję
+          LATEST_REVISION=$(az containerapp revision list \
+            --name $APP_NAME \
+            --resource-group $RESOURCE_GROUP \
+            --query "[?properties.active].name | [0]" -o tsv)
+
+          echo "Updating Container App to image: $IMAGE"
+          az containerapp update \
+            --name $APP_NAME \
+            --resource-group $RESOURCE_GROUP \
+            --image $IMAGE
+
+          echo "✅ Deployment triggered"
