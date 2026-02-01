@@ -58,18 +58,20 @@ jobs:
 
       - name: Build & tag image
         run: |
-          IMAGE=ghcr.io/${{ github.repository }}/devops-demo:${{ github.sha }}
-          echo "Image: $IMAGE"
+          IMAGE=ghcr.io/${{ github.repository }}/devops-demo:latest
+          echo "Building image $IMAGE"
           docker build -t $IMAGE -f Dockerfile .
 
       - name: Push image to GHCR
         run: |
-          IMAGE=ghcr.io/${{ github.repository }}/devops-demo:${{ github.sha }}
+          IMAGE=ghcr.io/${{ github.repository }}/devops-demo:latest
+          echo "Pushing image $IMAGE"
           docker push $IMAGE
 
+      # optional smoke test: run container and curl /health
       - name: Run container for smoke test
         run: |
-          IMAGE=ghcr.io/${{ github.repository }}/devops-demo:${{ github.sha }}
+          IMAGE=ghcr.io/${{ github.repository }}/devops-demo:latest
           docker run --rm -d --name smoke-devops-demo -p 8080:8080 $IMAGE
           for i in {1..15}; do
             if curl -fsS http://localhost:8080/health >/dev/null 2>&1; then
@@ -86,28 +88,25 @@ jobs:
     needs: docker-build
     runs-on: ubuntu-latest
     steps:
-      - name: Login to Azure
+      - uses: actions/checkout@v4
+
+      - name: Azure login via token
         run: |
-          echo "${{ secrets.AZURE_TOKEN }}" | az login --service-principal --username APP_ID --tenant TENANT_ID --password -
+          echo $AZURE_TOKEN | az login --identity
         env:
           AZURE_TOKEN: ${{ secrets.AZURE_TOKEN }}
 
-      - name: Update Azure Container App image
+      - name: Update Azure Container App with latest image
         run: |
           APP_NAME="devopsdemo-api"
           RESOURCE_GROUP="rg-masiamiszcz-deploy"
-          IMAGE=ghcr.io/${{ github.repository }}/devops-demo:${{ github.sha }}
+          IMAGE=ghcr.io/${{ github.repository }}/devops-demo:latest
 
-          # Pobierz aktualną rewizję
-          LATEST_REVISION=$(az containerapp revision list \
-            --name $APP_NAME \
-            --resource-group $RESOURCE_GROUP \
-            --query "[?properties.active].name | [0]" -o tsv)
+          echo "Updating Azure Container App $APP_NAME to image $IMAGE"
 
-          echo "Updating Container App to image: $IMAGE"
           az containerapp update \
             --name $APP_NAME \
             --resource-group $RESOURCE_GROUP \
             --image $IMAGE
-
-          echo "✅ Deployment triggered"
+        env:
+          AZURE_TOKEN: ${{ secrets.AZURE_TOKEN }}
