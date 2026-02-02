@@ -110,7 +110,7 @@ app.MapGet("/love", () =>
 
     return Results.Ok(new
     {
-        message = "MACIEJ KOCHA KORNELIE",
+        message = "MACIEJ KOCHA KORNELIE, przepraszam ze to tak dlugo trwa- problemy techniczne jak widzisz :D",
         timestamp = DateTime.UtcNow
     });
 });
