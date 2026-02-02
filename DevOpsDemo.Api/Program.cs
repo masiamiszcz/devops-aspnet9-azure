@@ -45,7 +45,7 @@ app.MapGet("/", (ILogger<Program> logger) =>
 
     return Results.Ok(new
     {
-        name = "KORNELIA JEST SUPER",
+        name = "TEST123",
         status = "Running",
         timestamp = DateTime.UtcNow
     });
