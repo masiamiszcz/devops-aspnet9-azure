@@ -104,6 +104,17 @@ app.MapGet("/health", () =>
     });
 });
 
+app.MapGet("/love", () =>
+{
+    Log.Information("Love endpoint called");
+
+    return Results.Ok(new
+    {
+        message = "MACIEJ KOCHA KORNELIE",
+        timestamp = DateTime.UtcNow
+    });
+});
+
 
 app.Run();
 // To make Program class accessible for integration tests
