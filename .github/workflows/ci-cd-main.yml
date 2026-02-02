@@ -58,15 +58,21 @@ jobs:
 
       - name: Build & tag image
         run: |
-          IMAGE=ghcr.io/${{ github.repository }}/devops-demo:latest
-          echo "Building image $IMAGE"
-          docker build -t $IMAGE -f Dockerfile .
+          IMAGE=ghcr.io/${{ github.repository }}/devops-demo
+          echo "Building image $IMAGE with commit hash"
+          docker build \
+            --build-arg GIT_SHA=${GITHUB_SHA} \
+            --no-cache \
+            -t $IMAGE:latest \
+            -t $IMAGE:${GITHUB_SHA::8} \
+            -f Dockerfile .
 
       - name: Push image to GHCR
         run: |
-          IMAGE=ghcr.io/${{ github.repository }}/devops-demo:latest
-          echo "Pushing image $IMAGE"
-          docker push $IMAGE
+          IMAGE=ghcr.io/${{ github.repository }}/devops-demo
+          echo "Pushing image $IMAGE:latest and commit tag"
+          docker push $IMAGE:latest
+          docker push $IMAGE:${GITHUB_SHA::8}
 
       - name: Run container for smoke test
         run: |
