@@ -42,5 +42,29 @@ namespace DevOpsDemo.Tests
                 Assert.NotNull(json);
             }
         }
+
+
+        [Fact]
+        public async Task ProductsEndpoint_ReturnsBitcoin()
+        {
+            var response = await _client.GetAsync("/products");
+
+            // MUSI być 200
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(json);
+
+            var root = doc.RootElement;
+
+            Assert.Equal(JsonValueKind.Array, root.ValueKind);
+            Assert.NotEmpty(root.EnumerateArray());
+
+            var coin = root[0];
+            var name = coin.GetProperty("name").GetString();
+
+            Assert.Equal("Bitcoin", name);
+        }
+
     }
 }
