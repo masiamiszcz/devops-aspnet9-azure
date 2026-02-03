@@ -104,16 +104,7 @@ app.MapGet("/health", () =>
     });
 });
 
-app.MapGet("/love", () =>
-{
-    Log.Information("Love endpoint called");
 
-    return Results.Ok(new
-    {
-        message = "MACIEJ KOCHA KORNELIE, przepraszam ze to tak dlugo trwa- problemy techniczne jak widzisz :D same bledy XD",
-        timestamp = DateTime.UtcNow
-    });
-});
 
 
 app.Run();
