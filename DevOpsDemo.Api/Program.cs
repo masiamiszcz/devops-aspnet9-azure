@@ -1,35 +1,41 @@
 using Serilog;
-
+using Microsoft.ApplicationInsights.Extensibility;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .Enrich.FromLogContext()
-    .Enrich.WithEnvironmentName()
-    .Enrich.WithThreadId()
-    .WriteTo.Console(
-        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties}{NewLine}{Exception}"
-    )
-    .CreateLogger();
+// ===== SERILOG + APPLICATION INSIGHTS =====
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .MinimumLevel.Information()
+        .Enrich.FromLogContext()
+        .Enrich.WithEnvironmentName()
+        .Enrich.WithThreadId()
+        .WriteTo.Console(
+            outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties}{NewLine}{Exception}"
+        )
+        .WriteTo.ApplicationInsights(
+            services.GetRequiredService<TelemetryConfiguration>(),
+            TelemetryConverter.Traces // logi jako traces
+        );
+});
 
-builder.Host.UseSerilog();  
-
-
-// Add services
+// ===== ADD SERVICES =====
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
+builder.Services.AddApplicationInsightsTelemetry(); // <- AI SDK
 
 var app = builder.Build();
+
+// ===== REQUEST LOGGING =====
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate =
         "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
 });
 
-
-// Configure pipeline
+// ===== SWAGGER =====
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -37,6 +43,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// ===== ENDPOINTS =====
 
 // ROOT endpoint
 app.MapGet("/", (ILogger<Program> logger) =>
@@ -50,7 +58,6 @@ app.MapGet("/", (ILogger<Program> logger) =>
         timestamp = DateTime.UtcNow
     });
 });
-
 
 // PRODUCTS endpoint (external API)
 app.MapGet("/products", async (HttpClient http, ILogger<Program> logger) =>
@@ -92,7 +99,7 @@ app.MapGet("/hello", () =>
     });
 });
 
-
+// HEALTH endpoint
 app.MapGet("/health", () =>
 {
     Log.Information("Health check endpoint called");
@@ -104,9 +111,18 @@ app.MapGet("/health", () =>
     });
 });
 
-
-
+// ===== VERSION endpoint (opcjonalnie, do automatycznego wersjonowania) =====
+app.MapGet("/version", () =>
+{
+    var commitSha = Environment.GetEnvironmentVariable("GIT_SHA") ?? "unknown";
+    return Results.Ok(new
+    {
+        version = commitSha,
+        timestamp = DateTime.UtcNow
+    });
+});
 
 app.Run();
+
 // To make Program class accessible for integration tests
 public partial class Program { }
