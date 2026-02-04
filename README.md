@@ -1,6 +1,5 @@
-# DevOps ASP.NET 9 Demo
-
-Minimalistyczny projekt DevOps oparty o ASP.NET 9 Web API, Docker i GitHub Actions.
+# DevOps ASP.NET 9 Demo 
+Projekt DevOps oparty o ASP.NET 9 Web API, Docker i GitHub Actions.
 
 ## 🎯 Cel projektu
 Celem projektu jest zaprezentowanie pełnego procesu DevOps:
@@ -15,11 +14,11 @@ Celem projektu jest zaprezentowanie pełnego procesu DevOps:
 - .NET 9 (ASP.NET Web API)
 - Docker
 - GitHub Actions (CI/CD)
-- Azure App Service (Containers)
+- Azure Container App
 - Azure Application Insights
-- Infrastructure as Code (Bicep)
 
 ## 📡 Endpointy
 - `GET /` – status aplikacji
-- `GET /products` – dane z zewnętrznego API (CoinGecko)
+- `GET /products` – dane z zewnętrznego API (CoinGecko) 
 - `GET /health` - health check
+- `GET /hello` - hello
