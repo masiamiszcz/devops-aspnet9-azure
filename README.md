@@ -9,6 +9,8 @@ Celem projektu jest zaprezentowanie pełnego procesu DevOps:
 - konteneryzacja (Docker)
 - wdrożenie do Azure
 - monitoring i bezpieczeństwo
+- wersjonowanie aplikacji
+- skalowanie aplikacji  
 
 ## 🧰 Technologie
 - .NET 9 (ASP.NET Web API)
